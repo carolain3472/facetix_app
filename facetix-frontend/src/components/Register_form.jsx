@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Button, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import "../scss/registro_style.css";
 import Swal from "sweetalert2";
 
@@ -17,6 +18,8 @@ export function Register_form() {
     profileImage: null, // Aquí almacenaremos la imagen seleccionada
     previewImage: null, // Aquí almacenaremos la vista previa de la imagen seleccionada
   });
+  const navigate = useNavigate();
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -113,6 +116,11 @@ export function Register_form() {
     console.log("Register form data:", registerFormData);
   };
 
+  const handleMenu = () => {
+    navigate("/")
+  }
+
+
   return (
     <Container
       fluid
@@ -133,7 +141,6 @@ export function Register_form() {
           top: 0,
           width: "100%",
           zIndex: 999,
-          backgroundColor: "white",
           padding: "1rem",
           boxShadow: "0 2px 4px rgba(0,0,0,0.4)",
           backgroundColor: "#333233",
@@ -157,6 +164,7 @@ export function Register_form() {
         <Button
           style={{ width: "5em", marginLeft: "1rem"}}
           variant="outline-secondary"
+          onClick={() => handleMenu()}
         >
           Menú
         </Button>
