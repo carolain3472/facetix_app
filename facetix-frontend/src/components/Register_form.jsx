@@ -1,20 +1,25 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Container, Row, Button, Form } from "react-bootstrap";
+import { api } from "../api/api_base";
 import { useNavigate } from "react-router-dom";
 import "../scss/registro_style.css";
 import Swal from "sweetalert2";
 
 export function Register_form() {
+  const [loginError, setLoginError] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [loginFormData, setLoginFormData] = useState({
     email: "",
     password: "",
   });
+
   const [registerFormData, setRegisterFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    username: "",
     profileImage: null, // Aquí almacenaremos la imagen seleccionada
     previewImage: null, // Aquí almacenaremos la vista previa de la imagen seleccionada
   });
@@ -45,41 +50,82 @@ export function Register_form() {
     }); // Almacenamos la imagen y su vista previa en el estado local
   };
 
+
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
   const handleLoginSubmit = (event) => {
     event.preventDefault();
-  
-    // Validar el formulario de inicio de sesión
-    if (!loginFormData.email || !loginFormData.password) {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Credentials!",
-        text: "Please enter your email and password.",
+    // Realiza una solicitud POST al servidor para el inicio de sesión
+    const email=loginFormData.email
+    const password=loginFormData.password
+    console.log(loginFormData.email)
+    console.log(loginFormData.password)
+    axios;
+    api
+      .post("/users/login/", { email, password }, { headers })
+      .then((response) => {
+        console.log(response)
+        console.log(response.data)
+        console.log(response.data.valid)
+        // Cuando la solicitud es exitosa
+        if (response.status == 200) {
+          sessionStorage.setItem("email", loginFormData.email);
+          console.log(response)
+          /* sessionStorage.setItem("email", response.data.user.email);
+          const fotoBack = decodeURIComponent(
+            response.data.user.profile_picture
+          );
+          sessionStorage.setItem("foto", fotoBack.substring(1));
+          localStorage.setItem("authToken", response.data.token); */
+          console.log(sessionStorage.getItem("foto"));
+          navigate("/");
+
+          Swal.fire({
+            icon: "success",
+            title: "Operación exitosa",
+            text: "Se ha iniciado sesión correctamente",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirigir a la página actual
+              window.location.reload();
+            }
+          });
+        } else {
+          setLoginError("Usuario o contraseña incorrectos");
+          console.log("No pudo validar el inicio de sesión");
+
+          Swal.fire({
+            icon: "warning",
+            title: "Datos incorrectos",
+            text: "Verifica tus credenciales",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Opps, parece que no existes",
+          text: "¡Unete!",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          showCancelButton: false,
+          timer: 1800,
+        });
       });
-      return; // Detener la ejecución de la función
-    }
-  
-    // Simular una petición de inicio de sesión
-    // Aquí puedes hacer la petición HTTP real a tu backend
-    // Por ahora, solo simulamos una respuesta exitosa (código 200)
-    const loginResponse = { status: 200 };
-  
-    // Verificar la respuesta del servidor
-    if (loginResponse.status === 200) {
-      // Si la respuesta es exitosa, muestra un mensaje de éxito
-      Swal.fire({
-        icon: "success",
-        title: "Login Successful!",
-        text: "You have successfully logged in.",
-      });
-    } else {
-      // Si hay un error en la respuesta, muestra un mensaje de error
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed!",
-        text: "Invalid email or password.",
-      });
-    }
   };
+
 
   const handleRegisterSubmit = (event) => {
     event.preventDefault();
@@ -104,17 +150,72 @@ export function Register_form() {
       });
       return; // Detener la ejecución de la función
     }
+
+    // Realiza una solicitud POST al servidor para el inicio de sesión
+    const first_name=registerFormData.name
+    const username= registerFormData.username
+    const email =registerFormData.email
+    const password=registerFormData.password
+
+    console.log(first_name)
+    console.log(username)
+    console.log(email)
+    console.log(password)
+
+    axios;
+    api
+      .post("/users/", { first_name, email, username, password }, { headers })
+      .then((response) => {
+        console.log(response)
+        console.log(response.data)
+        console.log(response.data.valid)
+        // Cuando la solicitud es exitosa
+        if (response.status == 200 || response.status == 201) {
+          navigate("/");
   
-    // Si el correo electrónico es válido y las contraseñas coinciden, se muestra una alerta de éxito
-    Swal.fire({
-      icon: "success",
-      title: "Registration Successful!",
-      text: "You have successfully registered.",
-    });
-  
-    // Aquí puedes hacer lo que necesites con los datos del formulario de registro, incluida la imagen de perfil
-    console.log("Register form data:", registerFormData);
+          Swal.fire({
+            icon: "success",
+            title: "Operación exitosa",
+            text: "Se ha iniciado sesión correctamente",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirigir a la página actual
+              window.location.reload();
+            }
+          });
+
+        }else{
+          Swal.fire({
+            icon: "warning",
+            title: "Datos incorrectos",
+            text: "Verifica tus credenciales",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Opps, parece que no existes",
+          text: "¡Unete!",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          showCancelButton: false,
+          timer: 1800,
+        });
+      });
   };
+
+  
 
   const handleMenu = () => {
     navigate("/")
@@ -254,6 +355,16 @@ export function Register_form() {
                   placeholder="Enter name"
                   name="name"
                   value={registerFormData.name}
+                  onChange={handleRegisterChange}
+                />
+              </Form.Group>
+              <Form.Group controlId="formBasicUsername">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter username"
+                  name="username"
+                  value={registerFormData.username}
                   onChange={handleRegisterChange}
                 />
               </Form.Group>
