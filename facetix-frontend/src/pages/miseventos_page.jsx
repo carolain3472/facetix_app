@@ -55,7 +55,7 @@ export function MisEventos_page() {
                   </Card.Text>
                 </Col>
                 <Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">See details</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -96,7 +96,7 @@ export function MisEventos_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">See details</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -136,7 +136,7 @@ export function MisEventos_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">See details</Button>
                 </Col>
               </Row>
             </Card.Body>
