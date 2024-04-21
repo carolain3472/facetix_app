@@ -3,6 +3,7 @@ import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import {Register_template} from './pages/register_page'
 import {Main_page} from './pages/main_page'
 import {Eventos_page} from './pages/eventos_page'
+import {MisEventos_page} from './pages/miseventos_page'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Route path='/' element= {<Main_page/>} />
       <Route path='/register' element ={<Register_template/>} />
       <Route path='/eventos' element ={<Eventos_page/>} />
+      <Route path='/miseventos' element ={<MisEventos_page/>} />
     </Routes>
 
   </BrowserRouter>

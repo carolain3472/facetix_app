@@ -96,6 +96,7 @@ export function Register_form() {
               window.location.reload();
             }
           });
+          navigate("/miseventos")
         } else {
           setLoginError("Usuario o contraseña incorrectos");
           console.log("No pudo validar el inicio de sesión");
@@ -187,6 +188,7 @@ export function Register_form() {
               window.location.reload();
             }
           });
+          navigate("/miseventos")
 
         }else{
           Swal.fire({
