@@ -1,0 +1,17 @@
+.hover-effect {
+    transition: transform 0.6s ease; /* Transición por defecto */
+  }
+  
+  .hover-effect:hover {
+    transform: scale(1.13);
+    transition: transform 0.3s ease; /* Transición al hacer hover */
+  }
+
+  .hover-effect2 {
+    transition: transform 0.6s ease; /* Transición por defecto */
+  }
+  
+  .hover-effect2:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease; /* Transición al hacer hover */
+  }
