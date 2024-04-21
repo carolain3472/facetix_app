@@ -47,14 +47,6 @@ export function Navbar_inicio() {
               >
                 Eventos
               </Nav.Link>
-              <Nav.Link
-                as={NavLink}
-                to="/register"
-                onClick={() => handleItemClick("Iniciar sesión/Registro")}
-                className={location.pathname === "/register" ? "active" : ""}
-              >
-                Verificar identidad
-              </Nav.Link>
             </Nav>
           </Container>
         </Navbar>
