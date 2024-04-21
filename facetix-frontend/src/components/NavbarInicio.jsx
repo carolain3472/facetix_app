@@ -33,7 +33,7 @@ export function Navbar_inicio() {
             <Nav>
               <Nav.Link
                 as={NavLink}
-                to="/"
+                to="/miseventos"
                 onClick={() => handleItemClick("MisEventos")}
                 className={location.pathname === "/miseventos" ? "active" : ""}
               >

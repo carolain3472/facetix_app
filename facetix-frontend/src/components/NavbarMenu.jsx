@@ -41,11 +41,11 @@ export function Navbar_menu() {
               </Nav.Link>
               <Nav.Link
                 as={NavLink}
-                to="/eventos"
-                onClick={() => handleItemClick("Eventos")}
-                className={location.pathname === "/eventos" ? "active" : ""}
+                to="/contacto"
+                onClick={() => handleItemClick("Contacto")}
+                className={location.pathname === "/contacto" ? "active" : ""}
               >
-                Eventos
+                Contacto
               </Nav.Link>
               <Nav.Link
                 as={NavLink}
