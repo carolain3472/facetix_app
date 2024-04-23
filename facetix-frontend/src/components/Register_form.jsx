@@ -1,12 +1,26 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { Container, Row, Button, Form } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Button,
+  Form,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import { api } from "../api/api_base";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import "../scss/registro_style.css";
 import Swal from "sweetalert2";
 
 export function Register_form() {
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraPermissionGranted, setCameraPermissionGranted] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState(null);
+  const [stream, setStream] = useState(null);
+  const [photoTaken, setPhotoTaken] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [loginFormData, setLoginFormData] = useState({
@@ -24,7 +38,6 @@ export function Register_form() {
     previewImage: null, // Aquí almacenaremos la vista previa de la imagen seleccionada
   });
   const navigate = useNavigate();
-
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -50,34 +63,33 @@ export function Register_form() {
     }); // Almacenamos la imagen y su vista previa en el estado local
   };
 
-
   const headers = {
-    'Content-Type': 'multipart/form-data'
+    "Content-Type": "multipart/form-data",
   };
 
   const handleLoginSubmit = (event) => {
     event.preventDefault();
     // Realiza una solicitud POST al servidor para el inicio de sesión
-    const email=loginFormData.email
-    const password=loginFormData.password
-    console.log(loginFormData.email)
-    console.log(loginFormData.password)
+    const email = loginFormData.email;
+    const password = loginFormData.password;
+    console.log(loginFormData.email);
+    console.log(loginFormData.password);
     axios;
     api
       .post("/users/login/", { email, password }, { headers })
       .then((response) => {
-        console.log(response)
+        console.log(response);
         // Cuando la solicitud es exitosa
         if (response.status == 200) {
           sessionStorage.setItem("email", loginFormData.email);
           sessionStorage.setItem("usuario", JSON.stringify(response.data));
           sessionStorage.setItem("usuario_id", response.data.user.id);
-          navigate("/");
+          navigate("/miseventos")
 
           Swal.fire({
             icon: "success",
-            title: "Operación exitosa",
-            text: "Se ha iniciado sesión correctamente",
+            title: "Login successful",
+            text: "Welcome back, we've been waiting for you",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -85,7 +97,7 @@ export function Register_form() {
           }).then((result) => {
             if (result.isConfirmed) {
               // Redirigir a la página actual
-              window.location.reload();
+              
             }
           });
         } else {
@@ -94,8 +106,8 @@ export function Register_form() {
 
           Swal.fire({
             icon: "warning",
-            title: "Datos incorrectos",
-            text: "Verifica tus credenciales",
+            title: "Wrong information",
+            text: "Check your credentials, something might be wrong",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -108,8 +120,8 @@ export function Register_form() {
 
         Swal.fire({
           icon: "error",
-          title: "Opps, parece que no existes",
-          text: "¡Unete!",
+          title: "Opps, something went wrong",
+          text: "We could not find you on our records",
           showConfirmButton: false,
           allowOutsideClick: false,
           showCancelButton: false,
@@ -118,10 +130,9 @@ export function Register_form() {
       });
   };
 
-
   const handleRegisterSubmit = (event) => {
     event.preventDefault();
-  
+
     // Validar el correo electrónico
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(registerFormData.email)) {
@@ -132,7 +143,7 @@ export function Register_form() {
       });
       return; // Detener la ejecución de la función
     }
-  
+
     // Validar la coincidencia de contraseñas
     if (registerFormData.password !== registerFormData.confirmPassword) {
       Swal.fire({
@@ -144,34 +155,38 @@ export function Register_form() {
     }
 
     // Realiza una solicitud POST al servidor para el inicio de sesión
-    const first_name=registerFormData.name
-    const username= registerFormData.username
-    const email =registerFormData.email
-    const password =registerFormData.password
-    const photo =registerFormData.profileImage
+    const first_name = registerFormData.name;
+    const username = registerFormData.username;
+    const email = registerFormData.email;
+    const password = registerFormData.password;
+    const photo = capturedPhoto;
 
-    console.log(first_name)
-    console.log(username)
-    console.log(email)
-    console.log(password)
-
+    console.log(first_name);
+    console.log(username);
+    console.log(email);
+    console.log(password);
 
     axios;
     api
-      .post("/users/", { first_name, email, username, password, photo}, { headers })
+      .post(
+        "/users/",
+        { first_name, email, username, password, photo },
+        { headers }
+      )
       .then((response) => {
-        console.log(response)
-        console.log(response.data)
-        console.log(response.data.valid)
+        console.log(response);
+        console.log(response.data);
+        console.log(response.data.valid);
         // Cuando la solicitud es exitosa
         if (response.status == 200 || response.status == 201) {
           sessionStorage.setItem("usuario", JSON.stringify(response.data));
-          navigate("/");
-  
+          sessionStorage.setItem("usuario_id", response.data.id);
+          navigate("/miseventos");
+
           Swal.fire({
             icon: "success",
-            title: "Operación exitosa",
-            text: "Se ha iniciado sesión correctamente",
+            title: "Successfully registered",
+            text: "Welcome aboard, enjoy our endless list of events",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -182,8 +197,7 @@ export function Register_form() {
               window.location.reload();
             }
           });
-
-        }else{
+        } else {
           Swal.fire({
             icon: "warning",
             title: "Datos incorrectos",
@@ -200,7 +214,7 @@ export function Register_form() {
 
         Swal.fire({
           icon: "error",
-          title: "Opps, parece que no existes",
+          title: "Opps, something's wrong, please check your information",
           text: "¡Unete!",
           showConfirmButton: false,
           allowOutsideClick: false,
@@ -210,12 +224,46 @@ export function Register_form() {
       });
   };
 
+  const openCamera = async () => {
+    try {
+      if (!cameraPermissionGranted) {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        setStream(mediaStream);
+        setCameraPermissionGranted(true);
+      }
+      setCameraActive(!cameraActive);
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+    }
+  };
+
+  const takePhoto = () => {
+    const video = document.getElementById("camera-preview");
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      const imageFile = new File([blob], 'photo.png', { type: 'image/png' });
+      setCapturedPhoto(imageFile); // Almacenar la foto capturada como un objeto de archivo
+      setPhotoTaken(true);
+      openCamera();
+    }, 'image/png');
+  };
   
 
-  const handleMenu = () => {
-    navigate("/")
-  }
+  useEffect(() => {
+    if (stream && cameraActive) {
+      const video = document.getElementById("camera-preview");
+      video.srcObject = stream;
+    }
+  }, [stream, cameraActive]);
 
+  const handleMenu = () => {
+    navigate("/");
+  };
 
   return (
     <Container
@@ -228,7 +276,6 @@ export function Register_form() {
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: "#7d7c7d",
-        
       }}
     >
       <Row
@@ -258,7 +305,7 @@ export function Register_form() {
           Register
         </Button>
         <Button
-          style={{ width: "5em", marginLeft: "1rem"}}
+          style={{ width: "5em", marginLeft: "1rem" }}
           variant="outline-secondary"
           onClick={() => handleMenu()}
         >
@@ -273,7 +320,6 @@ export function Register_form() {
           borderRadius: "10px",
           boxShadow: "0 0 30px rgba(0,0,0,0.6)", // Añadir sombra al contenedor
           padding: "2rem", // Añadir relleno al contenedor
-          
         }}
       >
         <Form
@@ -335,13 +381,77 @@ export function Register_form() {
                   />
                 </div>
               )}
-              <Form.Group controlId="formBasicProfileImage">
-                <Form.Label>Profile Image</Form.Label>
-                <Form.Control
-                  type="file"
-                  name="profileImage"
-                  onChange={handleImageChange}
-                />
+              <Form.Group controlId="formSelfie" className="mb-3">
+                <Form.Label>
+                  Take a Selfie{" "}
+                  <OverlayTrigger
+                    placement="top"
+                    overlay={
+                      <Tooltip id="tooltip-info">
+                        Al tomar una selfie, estás contribuyendo a mejorar la
+                        seguridad y la experiencia de todos los asistentes al
+                        evento. Utilizaremos esta imagen para verificar tu
+                        identidad al momento de validar tu entrada. Este proceso
+                        nos ayuda a garantizar que solo los compradores
+                        originales puedan acceder al evento, lo que reduce
+                        significativamente la posibilidad de reventa de entradas
+                        y garantiza una experiencia más justa y segura para
+                        todos. ¡Gracias por tu cooperación en mantener nuestros
+                        eventos seguros y protegidos!
+                      </Tooltip>
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={faInfoCircle}
+                      style={{ cursor: "help" }}
+                    />
+                  </OverlayTrigger>
+                </Form.Label>
+                <Button
+                  variant="primary"
+                  onClick={openCamera}
+                  className="me-2 ms-2 btn-sm"
+                >
+                  {cameraActive ? "Close Camera" : "Open Camera"}
+                </Button>
+                {cameraActive && cameraPermissionGranted && (
+                  <>
+                    <video
+                      id="camera-preview"
+                      autoPlay
+                      style={{
+                        width: "100%",
+                        maxWidth: "100%",
+                        height: "auto",
+                        marginTop: "1rem",
+                      }}
+                      className="mb-2"
+                    ></video>
+                    <Button
+                      variant="success"
+                      onClick={takePhoto}
+                      className="me-2"
+                    >
+                      Take Photo
+                    </Button>
+                  </>
+                )}
+                {photoTaken && (
+                  <>
+                    <h2 className="mb-2">Photo Taken</h2>
+                    <img
+                      src={URL.createObjectURL(capturedPhoto)}
+                      alt="Captured"
+                      style={{
+                        maxWidth: "100%", // Asegura que la imagen no supere el ancho del contenedor
+                        maxHeight: "100%", // Asegura que la imagen no supere la altura del contenedor
+                        width: "auto", // Ajusta el ancho automáticamente
+                        height: "auto", // Ajusta la altura automáticamente
+                        marginTop: "1rem", // Agrega un margen superior para separar la imagen del resto del contenido
+                      }}
+                    />
+                  </>
+                )}
               </Form.Group>
               <Form.Group controlId="formBasicName">
                 <Form.Label>Name</Form.Label>
