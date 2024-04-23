@@ -414,7 +414,7 @@ export function Eventos_page() {
                           <div className="d-flex align-content-center me-2">
                             <Button
                               variant="secondary"
-                              onClick={openVerificationModal}
+                              onClick={() => openVerificationModal(event)}
                               className="btn-sm"
                             >
                               Verify Event
