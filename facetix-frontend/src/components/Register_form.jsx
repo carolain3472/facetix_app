@@ -244,12 +244,14 @@ export function Register_form() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-    const photoURL = canvas.toDataURL("image/png");
-
-    setCapturedPhoto(photoURL); // Almacenar la foto tomada para comprar ticket
-    setPhotoTaken(true);
-    openCamera();
+    canvas.toBlob((blob) => {
+      const imageFile = new File([blob], 'photo.png', { type: 'image/png' });
+      setCapturedPhoto(imageFile); // Almacenar la foto capturada como un objeto de archivo
+      setPhotoTaken(true);
+      openCamera();
+    }, 'image/png');
   };
+  
 
   useEffect(() => {
     if (stream && cameraActive) {
@@ -437,7 +439,7 @@ export function Register_form() {
                   <>
                     <h2 className="mb-2">Photo Taken</h2>
                     <img
-                      src={capturedPhoto}
+                      src={URL.createObjectURL(capturedPhoto)}
                       alt="Captured"
                       style={{
                         maxWidth: "100%", // Asegura que la imagen no supere el ancho del contenedor
