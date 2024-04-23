@@ -88,8 +88,8 @@ export function Register_form() {
 
           Swal.fire({
             icon: "success",
-            title: "Operación exitosa",
-            text: "Se ha iniciado sesión correctamente",
+            title: "Login successful",
+            text: "Welcome back, we've been waiting for you",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -106,8 +106,8 @@ export function Register_form() {
 
           Swal.fire({
             icon: "warning",
-            title: "Datos incorrectos",
-            text: "Verifica tus credenciales",
+            title: "Wrong information",
+            text: "Check your credentials, something might be wrong",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -120,8 +120,8 @@ export function Register_form() {
 
         Swal.fire({
           icon: "error",
-          title: "Opps, parece que no existes",
-          text: "¡Unete!",
+          title: "Opps, something went wrong",
+          text: "We could not find you on our records",
           showConfirmButton: false,
           allowOutsideClick: false,
           showCancelButton: false,
@@ -180,12 +180,13 @@ export function Register_form() {
         // Cuando la solicitud es exitosa
         if (response.status == 200 || response.status == 201) {
           sessionStorage.setItem("usuario", JSON.stringify(response.data));
+          sessionStorage.setItem("usuario_id", response.data.id);
           navigate("/miseventos");
 
           Swal.fire({
             icon: "success",
-            title: "Operación exitosa",
-            text: "Se ha iniciado sesión correctamente",
+            title: "Successfully registered",
+            text: "Welcome aboard, enjoy our endless list of events",
             showConfirmButton: false,
             allowOutsideClick: false,
             showCancelButton: false,
@@ -213,7 +214,7 @@ export function Register_form() {
 
         Swal.fire({
           icon: "error",
-          title: "Opps, parece que no existes",
+          title: "Opps, something's wrong, please check your information",
           text: "¡Unete!",
           showConfirmButton: false,
           allowOutsideClick: false,
