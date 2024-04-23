@@ -18,7 +18,8 @@ function App() {
       <Route path='/register' element ={<Register_template/>} />
       <Route path='/contacto' element ={<ContactUs_page/>} />
       <Route path='/miseventos' element ={<MisEventos_page/>} />
-      <Route path='/eventos' element ={<Eventos_page/>} />
+      <Route path='/eventos/' element ={<Eventos_page/>} />
+      <Route path='/eventos/:searchTerm' element ={<Eventos_page/>} />
     </Routes>
 
   </BrowserRouter>
