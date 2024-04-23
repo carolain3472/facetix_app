@@ -144,8 +144,8 @@ export function Eventos_page() {
         console.error(error);
         Swal.fire({
           icon: "error",
-          title: "Opps, hubo un error",
-          text: "¡Notificalo!",
+          title: "Something went wrong",
+          text: "Please, try again",
           showConfirmButton: false,
           allowOutsideClick: false,
           showCancelButton: false,
@@ -181,12 +181,15 @@ export function Eventos_page() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-    const photoURL = canvas.toDataURL("image/png");
-
-    setVerificationPhoto(photoURL); // Almacenar la foto tomada para la verificación
-    setPhotoTaken(true);
-    openCamera();
+    canvas.toBlob((blob) => {
+      const imageFile = new File([blob], 'photo.png', { type: 'image/png' });
+      setVerificationPhoto(imageFile); // Almacenar la foto capturada como un objeto de archivo
+      setPhotoTaken(true);
+      openCamera();
+    }, 'image/png');
   };
+
+  
 
   useEffect(() => {
     if (stream && cameraActive) {
@@ -205,9 +208,11 @@ export function Eventos_page() {
 
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
 
-  const openVerificationModal = () => {
+  const openVerificationModal = (eventData) => {
     setVerificationModalOpen(true);
     setPhotoTaken(false);
+    console.log(eventData.id)
+    setSelectedEventId(eventData.id); // Actualizar el estado con el ID del evento seleccionado
   };
 
   const closeVerificationModal = () => {
@@ -217,9 +222,65 @@ export function Eventos_page() {
   };
 
   const handlePerformVerification = () => {
-    setVerificationPhoto(verificationPhoto); // Almacenar la foto capturada para la verificación
-    // Lógica de verificación de identidad aquí
+    const headers = {
+      "Content-Type": "multipart/form-data",
+    };
+
+    console.log(selectedEventId)
+    const user_photo = verificationPhoto
+    const event= selectedEventId;
+
+    
+    axios;
+    api
+      .post(
+        "/events/validate_user_entry/",
+        { event, user_photo },
+        { headers }
+      )
+      .then((response) => {
+        console.log(response);
+        console.log(response.data.id);
+        // Cuando la solicitud es exitosa
+        if (response.status === 200) {
+          setSelectedEvent(null);
+  
+          Swal.fire({
+            icon: "success",
+            title: `Identity confirmed`,
+            text: `We have successfully verified your identity with our records, enjoy the event!`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirigir a la página actual
+              window.location.reload();
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "No hay más boletas",
+            text: "Escoge otro evento",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Identity denied",
+          text: "Oops, it seems that your photo does not match with our records",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          showCancelButton: false,
+          timer: 1800,
+        });
+      });
   };
+  
 
   return (
     <>
@@ -291,7 +352,7 @@ export function Eventos_page() {
                           <div className="d-flex align-content-center me-2">
                             <Button
                               variant="secondary"
-                              onClick={openVerificationModal}
+                              onClick={() => openVerificationModal(event)}
                               className="btn-sm"
                             >
                               Verify Event
@@ -436,7 +497,7 @@ export function Eventos_page() {
               <>
                 <h2 className="mb-2">Photo Taken</h2>
                 <img
-                  src={verificationPhoto}
+                  src={URL.createObjectURL(verificationPhoto)}
                   alt="Captured"
                   style={{
                     maxWidth: "100%", // Asegura que la imagen no supere el ancho del contenedor
