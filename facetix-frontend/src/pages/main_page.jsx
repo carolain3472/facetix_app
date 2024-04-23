@@ -102,7 +102,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">V.I.P</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -143,7 +143,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">General</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -183,7 +183,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">General</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -355,7 +355,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">General</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -396,7 +396,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">VIP</Button>
                 </Col>
               </Row>
             </Card.Body>
@@ -436,7 +436,7 @@ export function Main_page() {
                   </Card.Text>
                 </Col>
                 <Col Col className="d-flex justify-content-end">
-                  <Button variant="warning">Buy Tickets</Button>
+                  <Button variant="warning">VIP</Button>
                 </Col>
               </Row>
             </Card.Body>
