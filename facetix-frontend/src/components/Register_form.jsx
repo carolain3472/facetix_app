@@ -52,7 +52,7 @@ export function Register_form() {
 
 
   const headers = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'multipart/form-data'
   };
 
   const handleLoginSubmit = (event) => {
@@ -67,19 +67,11 @@ export function Register_form() {
       .post("/users/login/", { email, password }, { headers })
       .then((response) => {
         console.log(response)
-        console.log(response.data)
-        console.log(response.data.valid)
         // Cuando la solicitud es exitosa
         if (response.status == 200) {
           sessionStorage.setItem("email", loginFormData.email);
-          console.log(response)
-          /* sessionStorage.setItem("email", response.data.user.email);
-          const fotoBack = decodeURIComponent(
-            response.data.user.profile_picture
-          );
-          sessionStorage.setItem("foto", fotoBack.substring(1));
-          localStorage.setItem("authToken", response.data.token); */
-          console.log(sessionStorage.getItem("foto"));
+          sessionStorage.setItem("usuario", JSON.stringify(response.data));
+          sessionStorage.setItem("usuario_id", response.data.user.id);
           navigate("/");
 
           Swal.fire({
@@ -96,7 +88,6 @@ export function Register_form() {
               window.location.reload();
             }
           });
-          navigate("/miseventos")
         } else {
           setLoginError("Usuario o contraseña incorrectos");
           console.log("No pudo validar el inicio de sesión");
@@ -156,22 +147,25 @@ export function Register_form() {
     const first_name=registerFormData.name
     const username= registerFormData.username
     const email =registerFormData.email
-    const password=registerFormData.password
+    const password =registerFormData.password
+    const photo =registerFormData.profileImage
 
     console.log(first_name)
     console.log(username)
     console.log(email)
     console.log(password)
 
+
     axios;
     api
-      .post("/users/", { first_name, email, username, password }, { headers })
+      .post("/users/", { first_name, email, username, password, photo}, { headers })
       .then((response) => {
         console.log(response)
         console.log(response.data)
         console.log(response.data.valid)
         // Cuando la solicitud es exitosa
         if (response.status == 200 || response.status == 201) {
+          sessionStorage.setItem("usuario", JSON.stringify(response.data));
           navigate("/");
   
           Swal.fire({
@@ -188,7 +182,6 @@ export function Register_form() {
               window.location.reload();
             }
           });
-          navigate("/miseventos")
 
         }else{
           Swal.fire({

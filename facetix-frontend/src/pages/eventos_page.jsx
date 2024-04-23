@@ -1,3 +1,4 @@
+import axios from "axios";
 import { React, useState, useEffect } from "react";
 import { Navbar_inicio } from "../components/NavbarInicio";
 import { Container, Row, Button, Col, Card, Modal, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -5,105 +6,73 @@ import Footer from "../components/Footer";
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { api } from "../api/api_base";
 
 
 export function Eventos_page() {
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [verificationPhoto, setVerificationPhoto] = useState(null); // Nuevo estado para la foto de verificación
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [verificationPhoto, setVerificationPhoto] = useState(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraPermissionGranted, setCameraPermissionGranted] = useState(false);
   const [stream, setStream] = useState(null);
   const [photoTaken, setPhotoTaken] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
+  const [eventsData, setEventsData] = useState(null); // Estado para los datos de eventos
 
-  // Definir información de los eventos en un array de objetos
-  const eventsData = [
-    {
-      name: "Interpol",
-      date: "May 26, 2024",
-      price: 170,
-      image: "interpol.jpg",
-    },
-    {
-      name: "Ashnikko",
-      date: "May 17, 2024",
-      price: 210,
-      image: "ashnikko.jpg",
-    },
-    {
-      name: "Black Pumas",
-      date: "May 20, 2024",
-      price: 150,
-      image: "pumas.jpg",
-    },
-    {
-      name: "Anita",
-      date: "Jun 7, 2024",
-      price: 140,
-      image: "anita.jpg",
-    },
-    {
-      name: "Brutalismus",
-      date: "Abr 26, 2024",
-      price: 200,
-      image: "brutalismus.jpg",
-    },
-    {
-      name: "Diamantes Electricos",
-      date: "Ago 31, 2024",
-      price: 165,
-      image: "diamante.jpg",
-    },
-    {
-      name: "Ferxxocalipsis",
-      date: "Dic 8, 2024",
-      price: 300,
-      image: "ferxxo.jpg",
-    },
-    {
-      name: "Juanes",
-      date: "May 17, 2024",
-      price: 120,
-      image: "juanes.jpg",
-    },
-    {
-      name: "WOS",
-      date: "Oct 25, 2024",
-      price: 190,
-      image: "wos.jpg",
-    },
-    {
-      name: "Rawayana",
-      date: "Jul 5, 2024",
-      price: 105,
-      image: "rawayana.jpg",
-    },
-    {
-      name: "Travis Birds",
-      date: "May 1, 2024",
-      price: 90,
-      image: "travis.jpg",
-    },
-    {
-      name: "Milky Chance",
-      date: "May 8, 2024",
-      price: 120,
-      image: "milky.png",
-    },
-  ];
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
+  useEffect(() => {
+    handleEvents();
+  }, []);
+
+  const handleEvents = () => {
+    api
+      .get("/events/", { headers })
+      .then((response) => {
+        console.log(response.data)
+        const eventData = response.data.map(event => ({
+          id: event.id,
+          name: event.name,
+          date: event.date,
+          price:event.capacity,
+          image: event.file_cover,
+        }));
+        setEventsData(eventData); // Establece los datos de eventos en el estado
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
 
   const handleBuyTicketsClick = (eventData) => {
+    console.log("Event ID:", eventData.id); // Imprimir el ID del evento
+    setSelectedEventId(eventData.id); // Actualizar el estado con el ID del evento seleccionado
     setSelectedEvent(eventData);
   };
 
   const handleConfirmPurchase = () => {
-    const quantity = parseInt(document.getElementById('formQuantity').value);
+    const number = parseInt(document.getElementById('formQuantity').value);
+    const cost = selectedEvent.price;
+    const event = selectedEvent.id;
+    const assistant = sessionStorage.getItem("usuario_id");
+
     const name = document.getElementById('formName').value;
     const documentNumber = document.getElementById('formDocument').value;
-    const totalPrice = selectedEvent.price * quantity;
-    const selfieURL = verificationPhoto || capturedPhoto; // Usar la foto de verificación si está disponible
+    const totalPrice = selectedEvent.price * number;
+    const selfieURL = verificationPhoto || capturedPhoto;
 
-    if (quantity <= 0 || isNaN(totalPrice) || name.trim() === '' || documentNumber.trim() === '') {
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    
+    console.log(usuario)
+    console.log(number)
+    console.log(selectedEvent.price)
+    console.log(assistant.id)
+
+    if (number <= 0 || isNaN(totalPrice) || name.trim() === '' || documentNumber.trim() === '') {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -113,7 +82,7 @@ export function Eventos_page() {
     }
 
     const formData = {
-      quantity: quantity,
+      quantity: number,
       name: name,
       documentNumber: documentNumber,
       totalPrice: totalPrice,
@@ -121,14 +90,54 @@ export function Eventos_page() {
       // Otros datos que desees enviar al servidor
     };
 
-    Swal.fire({
-      icon: 'success',
-      title: `Thank you, ${name}!`,
-      text: `Your purchase has been confirmed. Total: $${totalPrice}`,
-    });
+    axios;
+    api
+      .post("/buy-ticket-event/", { number, cost, event, assistant }, { headers })
+      .then((response) => {
+        console.log(response)
+        console.log(response.data.id)
+        console.log(response.data.valid)
+        // Cuando la solicitud es exitosa
+        if (response.status == 201) {
+          setSelectedEvent(null);
 
-    setSelectedEvent(null);
+          Swal.fire({
+            icon: 'success',
+            title: `Thank you, ${name}!`,
+            text: `Your purchase has been confirmed. Total: $${totalPrice}`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirigir a la página actual
+              window.location.reload();
+            }
+          });
+        } else {
+    
+          Swal.fire({
+            icon: "warning",
+            title: "No hay más boletas",
+            text: "Escoge otro evento",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            showCancelButton: false,
+            timer: 1800,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Opps, hubo un error",
+          text: "¡Notificalo!",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          showCancelButton: false,
+          timer: 1800,
+        });
+      });
   };
+
 
   const handleQuantityChange = () => {
     const quantity = parseInt(document.getElementById('formQuantity').value);
@@ -218,67 +227,72 @@ export function Eventos_page() {
               </h1>
               <h5>Check out some of the hottest upcoming events on FaceTix.</h5>
             </Row>
-            {eventsData.map((event, index) => (
-              <Col key={index} md={4}>
-                <Card
-                  className="hover-effect mx-auto"
-                  style={{
-                    width: "30rem",
-                    margin: "0 0 2rem 0",
-                    boxShadow: "10px 10px 10px rgba(0,0,0,0.5)",
-                  }}
+             {/* Renderizar solo si eventsData tiene información */}
+             {eventsData && eventsData.length > 0 ? (
+  eventsData.map((event, index) => (
+    <Col key={index} md={4}>
+      <Card
+        className="hover-effect mx-auto"
+        style={{
+          width: "30rem",
+          margin: "0 0 2rem 0",
+          boxShadow: "10px 10px 10px rgba(0,0,0,0.5)",
+        }}
+      >
+        <Card.Img
+          variant="top"
+          src={event.image}
+          style={{ height: "230px", objectFit: "contain" }}
+        />
+        <Card.Body>
+          <Row>
+            <Col>
+              <Card.Title>
+                <b>{event.name}</b>
+              </Card.Title>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: "2rem" }}>
+            <Col>
+              <Card.Text>{event.date}</Card.Text>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Card.Text>
+                <h2>
+                  <b>${event.price}</b>
+                </h2>
+              </Card.Text>
+            </Col>
+            <Col className="d-flex justify-content-end">
+              <div className="d-flex align-content-center me-2">
+                <Button
+                  variant="warning"
+                  onClick={() => handleBuyTicketsClick(event)}
+                  className="btn-sm"
                 >
-                  <Card.Img
-                    variant="top"
-                    src={event.image}
-                    style={{ height: "230px", objectFit: "contain" }}
-                  />
-                  <Card.Body>
-                    <Row>
-                      <Col>
-                        <Card.Title>
-                          <b>{event.name}</b>
-                        </Card.Title>
-                      </Col>
-                    </Row>
-                    <Row style={{ marginBottom: "2rem" }}>
-                      <Col>
-                        <Card.Text>{event.date}</Card.Text>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col>
-                        <Card.Text>
-                          <h2>
-                            <b>${event.price}</b>
-                          </h2>
-                        </Card.Text>
-                      </Col>
-                      <Col className="d-flex justify-content-end">
-                        <div className="d-flex align-content-center me-2">
-                          <Button
-                            variant="warning"
-                            onClick={() => handleBuyTicketsClick(event)}
-                            className="btn-sm"
-                          >
-                            Buy Tickets
-                          </Button>
-                        </div>
-                        <div className="d-flex align-content-center me-2">
-                          <Button
-                            variant="secondary"
-                            onClick={openVerificationModal}
-                            className="btn-sm"
-                          >
-                            Verify Event
-                          </Button>
-                        </div>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+                  Buy Tickets
+                </Button>
+              </div>
+              <div className="d-flex align-content-center me-2">
+                <Button
+                  variant="secondary"
+                  onClick={openVerificationModal}
+                  className="btn-sm"
+                >
+                  Verify Event
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+    </Col>
+  ))
+) : (
+  <div>Loading...</div>
+)}
           </Row>
         </Container>
       </div>
