@@ -14,8 +14,7 @@ export function Navbar_inicio() {
   };
 
   return (
-    <>
-      <Container fluid>
+    <Container fluid>
         <Navbar
           fixed="top"
           bg="light"
@@ -51,6 +50,5 @@ export function Navbar_inicio() {
           </Container>
         </Navbar>
       </Container>
-    </>
   );
 }
