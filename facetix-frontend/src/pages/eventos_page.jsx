@@ -17,6 +17,8 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { api } from "../api/api_base";
+import { useParams } from 'react-router-dom';
+
 
 export function Eventos_page() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -28,6 +30,8 @@ export function Eventos_page() {
   const [photoTaken, setPhotoTaken] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [eventsData, setEventsData] = useState(null); // Estado para los datos de eventos
+  const { searchTerm } = useParams();
+  const [searchTerm2, setSearchTerm2] = useState('');
 
   const headers = {
     "Content-Type": "application/json",
@@ -37,9 +41,18 @@ export function Eventos_page() {
     handleEvents();
   }, []);
 
+  console.log(`/events/?search=${searchTerm}`)
+
   const handleEvents = () => {
+    let url = '';
+    if (searchTerm !== undefined) {
+      url = `/events/?search=${searchTerm}`;
+    }else{
+      url = `/events/`;
+    }
+
     api
-      .get("/events/", { headers })
+      .get(url, { headers })
       .then((response) => {
         console.log(response.data);
         const eventData = response.data.map((event) => ({
@@ -221,6 +234,15 @@ export function Eventos_page() {
     setPhotoTaken(false);
   };
 
+
+  const handleInputChange = (event) => {
+    setSearchTerm2(event.target.value);
+  };
+  const handleSearch = (event) => {
+    event.preventDefault();
+    window.location.href = `/eventos/${searchTerm2}`;
+  };
+
   const handlePerformVerification = () => {
     const headers = {
       "Content-Type": "multipart/form-data",
@@ -285,6 +307,140 @@ export function Eventos_page() {
   return (
     <>
       <Navbar_inicio />
+      <Container fluid>
+
+
+      <Row
+          className="justify-content-center align-items-center text-center"
+          style={{
+            marginTop: "calc(10px + 0.09rem)", // Margen superior dinámico (altura del navbar + 1rem)
+            height: "10vh",
+            backgroundImage:
+              "linear-gradient(to bottom right, #FFD100, #9C5D0B)",
+            color: "#ffffff",
+          }}
+        >
+          <Col xs={12}>
+           
+            <Form style={{ marginTop: "5rem" }} onSubmit={handleSearch}>
+              <Row className="justify-content-center">
+                <Col xs="auto">
+                  <Form.Control
+                    type="text"
+                    placeholder="Search for events"
+                    value={searchTerm2}
+                    onChange={handleInputChange}
+                    className="mr-sm-2"
+                    style={{ boxShadow: "0 0 10px rgba(0,0,0,0.5)" }}
+                  />
+                </Col>
+                <Col xs="auto">
+                  <Button
+                    type="submit"
+                    variant="dark"
+                    style={{ boxShadow: "0 0 10px rgba(0,0,0,0.5)" }}
+                  >
+                    Search
+                  </Button>
+                </Col>
+              </Row>
+            </Form>
+          </Col>
+        </Row>
+
+
+
+        <Row
+          className="justify-content-center align-items-center"
+          style={{
+            marginTop: "calc(55px + 0.09rem)",
+            minHeight: "100vh", // Altura mínima para ocupar el espacio restante
+          }}
+        >
+          <Row className="justify-content-center align-items-center text-center">
+            <h1>
+              <b>Events</b>
+            </h1>
+            <h5>Check out some of the hottest upcoming events on FaceTix.</h5>
+          </Row>
+            {/* Renderizar solo si eventsData tiene información */}
+            {eventsData && eventsData.length > 0 ? (
+              eventsData.map((event, index) => (
+                <Col key={index} md={4}>
+                  <Card
+                    className="hover-effect mx-auto"
+                    style={{
+                      width: "30rem",
+                      margin: "0 0 2rem 0",
+                      boxShadow: "10px 10px 10px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    <Card.Img
+                      variant="top"
+                      src={event.image}
+                      style={{ height: "230px", objectFit: "contain" }}
+                    />
+                    <Card.Body>
+                      <Row>
+                        <Col>
+                          <Card.Title>
+                            <b>{event.name}</b>
+                          </Card.Title>
+                        </Col>
+                      </Row>
+                      <Row style={{ marginBottom: "2rem" }}>
+                        <Col>
+                          <Card.Text>{event.date}</Card.Text>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col>
+                          <Card.Text>
+                            <h2>
+                              <b>${event.price}</b>
+                            </h2>
+                          </Card.Text>
+                        </Col>
+                        <Col className="d-flex justify-content-end">
+                          <div className="d-flex align-content-center me-2">
+                            <Button
+                              variant="warning"
+                              onClick={() => handleBuyTicketsClick(event)}
+                              className="btn-sm"
+                            >
+                              Buy Tickets
+                            </Button>
+                          </div>
+                          <div className="d-flex align-content-center me-2">
+                            <Button
+                              variant="secondary"
+                              onClick={openVerificationModal}
+                              className="btn-sm"
+                            >
+                              Verify Event
+                            </Button>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            ): (
+
+              <Row className="justify-content-center align-items-center text-center">
+                {eventsData && eventsData.length === 0 ? (
+                  <h3>Sin resultados</h3>
+                ) : (
+                  <h2>Loading...</h2>
+                )}
+              
+              </Row>
+            )}
+            
+           
+        </Row>
+      </Container>
       <div style={{ paddingBottom: "100px" }}>
         <Container fluid>
           <Row

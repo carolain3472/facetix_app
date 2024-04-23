@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Navbar_menu } from "../components/NavbarMenu";
 import { Container, Row, Form, Button, Col, Card } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,6 +11,17 @@ import "../scss/card_style.css";
 import Footer from "../components/Footer";
 
 export function Main_page() {
+
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleInputChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+  const handleSearch = (event) => {
+    event.preventDefault();
+    window.location.href = `/eventos/${searchTerm}`;
+  };
+
   return (
     <>
       <Navbar_menu />
@@ -35,12 +46,14 @@ export function Main_page() {
               FaceTix is your one-stop destination for finding and purchasing
               tickets to the most exciting events in your area.
             </p>
-            <Form style={{ marginTop: "5rem" }}>
+            <Form style={{ marginTop: "5rem" }} onSubmit={handleSearch}>
               <Row className="justify-content-center">
                 <Col xs="auto">
                   <Form.Control
                     type="text"
                     placeholder="Search for events"
+                    value={searchTerm}
+                    onChange={handleInputChange}
                     className="mr-sm-2"
                     style={{ boxShadow: "0 0 10px rgba(0,0,0,0.5)" }}
                   />
@@ -51,7 +64,7 @@ export function Main_page() {
                     variant="dark"
                     style={{ boxShadow: "0 0 10px rgba(0,0,0,0.5)" }}
                   >
-                    Submit
+                    Search
                   </Button>
                 </Col>
               </Row>
@@ -222,7 +235,6 @@ export function Main_page() {
                 >
                   <Card.Body>
                     <Col
-                      Col
                       className="d-flex justify-content-start"
                       style={{ marginBottom: "1rem" }}
                     >
@@ -253,7 +265,6 @@ export function Main_page() {
                 >
                   <Card.Body>
                     <Col
-                      Col
                       className="d-flex justify-content-start"
                       style={{ marginBottom: "1rem" }}
                     >
@@ -283,7 +294,6 @@ export function Main_page() {
                 >
                   <Card.Body>
                     <Col
-                      Col
                       className="d-flex justify-content-start"
                       style={{ marginBottom: "1rem" }}
                     >
